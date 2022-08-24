@@ -14,7 +14,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
      * @var array
      */
     protected $data = [];
-    
+
     /**
      * DataObject constructor.
      *
@@ -24,7 +24,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
     {
         $this->data = $data;
     }
-    
+
     /**
      * @param string $method
      * @param array  $args
@@ -35,7 +35,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
     public function __call($method, $args)
     {
         $key = $this->underscore(substr($method, 3));
-        
+
         switch (substr($method, 0, 3)) {
             case 'get':
                 $index = isset($args[0]) ? $args[0] : null;
@@ -48,11 +48,11 @@ class DataObject implements DataObjectInterface, \ArrayAccess
             case 'has':
                 return $this->hasData($key);
         }
-        
+
         $class = get_class($this);
         throw new DataObjectException("The method {$method} does not exist in the class {$class}.");
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -61,18 +61,18 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         if (null === $key) {
             return $this->data;
         }
-        
+
         if (is_array($key)) {
             return $this->data;
         }
-        
+
         if (!isset($this->data[$key])) {
             return null;
         }
-        
+
         return $this->data[$key];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -81,14 +81,14 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         if (is_array($key)) {
             $this->data = (array) $key;
         }
-        
+
         if (!is_array($key)) {
             $this->data[$key] = $value;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -97,22 +97,22 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         if (null === $key) {
             $this->setData([]);
         }
-        
+
         if (is_string($key)) {
             if (isset($this->data[$key]) || array_key_exists($key, $this->data)) {
                 unset($this->data[$key]);
             }
         }
-        
+
         if (is_array($key)) {
             foreach ($key as $element) {
                 $this->unsetData($element);
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -122,13 +122,13 @@ class DataObject implements DataObjectInterface, \ArrayAccess
             if (empty($key) || empty($value)) {
                 continue;
             }
-            
+
             $this->data[$key] = $value;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -136,7 +136,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
     {
         return (bool) isset($this->data[$key]);
     }
-    
+
     /**
      * @return bool
      */
@@ -144,7 +144,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
     {
         return empty($this->data);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -153,7 +153,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         $this->data = [];
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -161,7 +161,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
     {
         return (array) $this->data;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -170,17 +170,17 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         if (empty($keys)) {
             return (array) $this->data;
         }
-        
+
         $result = [];
-        
+
         /** @var string $key */
         foreach ($keys as $key) {
             $result[$key] = $this->getData($key);
         }
-        
+
         return (array) $result;
     }
-    
+
     /**
      * Implementation of ArrayAccess::offsetSet()
      *
@@ -188,11 +188,11 @@ class DataObject implements DataObjectInterface, \ArrayAccess
      * @param string $offset
      * @param mixed $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
-        return $this->setData($offset, $value);
+        $this->setData($offset, $value);
     }
-    
+
     /**
      * Implementation of ArrayAccess::offsetExists()
      *
@@ -200,22 +200,22 @@ class DataObject implements DataObjectInterface, \ArrayAccess
      * @param string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->hasData($offset);
     }
-    
+
     /**
      * Implementation of ArrayAccess::offsetUnset()
      *
      * @link http://www.php.net/manual/en/arrayaccess.offsetunset.php
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
-        return $this->unsetData($offset);
+        $this->unsetData($offset);
     }
-    
+
     /**
      * Implementation of ArrayAccess::offsetGet()
      *
@@ -223,11 +223,11 @@ class DataObject implements DataObjectInterface, \ArrayAccess
      * @param string $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->getData($offset);
     }
-    
+
     /**
      * @param string $name
      *
@@ -238,7 +238,7 @@ class DataObject implements DataObjectInterface, \ArrayAccess
         $result = preg_replace('/([A-Z]|[0-9]+)/', "_$1", $name);
         $result = trim($result, '_');
         $result = strtolower($result);
-        
+
         return $result;
     }
 }
